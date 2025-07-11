@@ -47,21 +47,32 @@ def init():
 # 获取建议
 @app.route('/advice', methods=['POST'])
 def advice():
-    data = request.json
-    date = data.get("date")
-    personality = data.get("personality")
-
-    news = get_news(DATA_FILE, date)
-    holdings = get_holdings(HOLDINGS_FILE)
-    system_prompt = Prompts.get_personality(personality)
-    advice_prompt = Prompts.get_advice_prompt(news, holdings)
-    response = chat(system_prompt, advice_prompt)
-
     try:
+        data = request.json
+        print("✅ 收到请求数据：", data)
+
+        date = data.get("date")
+        personality = data.get("personality")
+
+        news = get_news(DATA_FILE, date)
+        holdings = get_holdings(HOLDINGS_FILE)
+        print("📄 News 摘要：", news[:200])
+        print("📊 Holdings 摘要：", holdings)
+
+        system_prompt = Prompts.get_personality(personality)
+        advice_prompt = Prompts.get_advice_prompt(news, holdings)
+        print("🤖 Prompt 生成完成")
+
+        response = chat(system_prompt, advice_prompt)
+        print("✅ AI 响应完成")
+
         result = json.loads(response.choices[0].message.content)
         return jsonify(result)
+
     except Exception as e:
-        return jsonify({"error": f"Response parse error: {str(e)}"})
+        print("❌ 错误发生在 /advice：", str(e))
+        return jsonify({"error": f"Response parse error: {str(e)}"}), 500
+
 
 # 执行交易
 @app.route('/trade', methods=['POST'])
