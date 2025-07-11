@@ -4,10 +4,9 @@ from openai import OpenAI
 import yfinance as yf
 from datetime import datetime
 
-# ✅ 推荐使用的模型提供商
+# ✅ 配置：从环境变量读取 API Key（更安全）
 PROVIDER = "OpenRouter"
 
-# ✅ 从环境变量中读取 API key（更安全）
 PARAMS = {
     "OpenRouter": {
         "API_KEY": os.getenv("OPENROUTER_API_KEY"),
@@ -25,6 +24,10 @@ API_KEY = PARAMS[PROVIDER]["API_KEY"]
 BASE_URL = PARAMS[PROVIDER]["BASE_URL"]
 MODEL = PARAMS[PROVIDER]["MODEL"]
 
+if not API_KEY:
+    raise EnvironmentError(f"❌ Missing API key for {PROVIDER}. Please set it as an environment variable.")
+
+# ✅ 投资组合状态初始化
 def init_state(file_path: str, amount: float):
     data = {
         "cash": amount,
@@ -34,6 +37,7 @@ def init_state(file_path: str, amount: float):
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
+# ✅ 买入操作
 def buy_stock(file_path: str, symbol: str, quantity: int, price: float, datetime: str):
     with open(file_path, 'r') as f:
         data = json.load(f)
@@ -65,6 +69,7 @@ def buy_stock(file_path: str, symbol: str, quantity: int, price: float, datetime
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
+# ✅ 卖出操作
 def sell_stock(file_path: str, symbol: str, quantity: int, price: float, datetime: str):
     with open(file_path, 'r') as f:
         data = json.load(f)
@@ -78,7 +83,7 @@ def sell_stock(file_path: str, symbol: str, quantity: int, price: float, datetim
     total_value = quantity * price
     data["cash"] += total_value
 
-    # FIFO sell logic
+    # FIFO
     remaining = quantity
     transactions = data["holdings"][symbol]["transactions"]
     for i in range(len(transactions)):
@@ -99,16 +104,13 @@ def sell_stock(file_path: str, symbol: str, quantity: int, price: float, datetim
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
+# ✅ 调用大模型获取建议
 def chat(system_prompt: str, user_prompt: str):
-    client = OpenAI(
-        api_key=API_KEY,
-        base_url=BASE_URL,
-    )
+    client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt}
     ]
-
     response = client.chat.completions.create(
         model=MODEL,
         messages=messages,
@@ -116,38 +118,40 @@ def chat(system_prompt: str, user_prompt: str):
     )
     return response
 
+# ✅ 读取指定月份的新闻内容
 def get_news(file_path: str, datetime: str):
     with open(file_path, 'r') as file:
         data = json.load(file)
 
-        if datetime not in data:
-            return f"No data found for {datetime}."
+    if datetime not in data:
+        return f"No data found for {datetime}."
 
-        output = f"Company News and Stock Information for {datetime}:\n\n"
-        for company, info in data[datetime].items():
-            output += f"Company: {company}\n"
+    output = f"Company News and Stock Information for {datetime}:\n\n"
+    for company, info in data[datetime].items():
+        output += f"Company: {company}\n"
 
-            stock = info.get('stock', {})
-            price = stock.get('price', 'N/A')
-            change = stock.get('change', 'N/A')
-            volume = stock.get('volume', 'N/A')
-            output += "Stock Information:\n"
-            output += f"  Price: ${price}\n"
-            output += f"  Change: {change}%\n"
-            output += f"  Volume: {volume}\n"
+        stock = info.get('stock', {})
+        price = stock.get('price', 'N/A')
+        change = stock.get('change', 'N/A')
+        volume = stock.get('volume', 'N/A')
+        output += "Stock Information:\n"
+        output += f"  Price: ${price}\n"
+        output += f"  Change: {change}%\n"
+        output += f"  Volume: {volume}\n"
 
-            news_list = info.get('news', [])
-            output += "News:\n"
-            if not news_list:
-                output += "  No news available.\n"
-            else:
-                for news_item in news_list:
-                    title = news_item.get('title', 'N/A')
-                    date = news_item.get('date', 'N/A')
-                    output += f"  - {title}\n    Date: {date}\n"
-            output += "\n"
-        return output.strip()
+        news_list = info.get('news', [])
+        output += "News:\n"
+        if not news_list:
+            output += "  No news available.\n"
+        else:
+            for news_item in news_list:
+                title = news_item.get('title', 'N/A')
+                date = news_item.get('date', 'N/A')
+                output += f"  - {title}\n    Date: {date}\n"
+        output += "\n"
+    return output.strip()
 
+# ✅ 获取当前持仓信息
 def get_holdings(file_path: str):
     with open(file_path, 'r') as f:
         data = json.load(f)
@@ -163,6 +167,7 @@ def get_holdings(file_path: str):
 
     return output.strip()
 
+# ✅ 获取某支股票某月的价格信息
 def get_price(symbol: str, year_month: str) -> dict:
     try:
         year, month = map(int, year_month.split('-'))
@@ -189,6 +194,7 @@ def get_price(symbol: str, year_month: str) -> dict:
         print(f"Error fetching data for {symbol}: {e}")
         return {}
 
+# ✅ 批量更新 JSON 中的股票价格
 def update_stock_data(file_path: str):
     with open(file_path, 'r') as f:
         data = json.load(f)
