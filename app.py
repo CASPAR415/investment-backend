@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask import Response
 from flask_cors import CORS
+import functions
 from utils.prompt import Prompts
 from utils.functions import (
     init_state, buy_stock, sell_stock,
@@ -118,6 +119,11 @@ def prices():
         return jsonify(data[date])
     except Exception as e:
         return jsonify({"error": str(e)})
+
+
+print(f"From app.py - API_KEY: {functions.API_KEY[:10]}...")
+print(f"From app.py - BASE_URL: {functions.BASE_URL}")
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
