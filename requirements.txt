@@ -3,3 +3,4 @@ flask_cors==6.0.1
 openai==1.95.0
 pandas==2.3.1
 yfinance==0.2.64
+gunicorn
