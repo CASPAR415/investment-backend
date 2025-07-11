@@ -24,6 +24,10 @@ API_KEY = PARAMS[PROVIDER]["API_KEY"]
 BASE_URL = PARAMS[PROVIDER]["BASE_URL"]
 MODEL = PARAMS[PROVIDER]["MODEL"]
 
+print(f"API_KEY = {API_KEY}")
+print(f"BASE_URL = {BASE_URL}")
+
+
 print(f"✅ Loaded API_KEY: {API_KEY[:10]}...")  # 只打印前 10 位，避免泄露
 
 
