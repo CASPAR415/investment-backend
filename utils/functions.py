@@ -24,6 +24,9 @@ API_KEY = PARAMS[PROVIDER]["API_KEY"]
 BASE_URL = PARAMS[PROVIDER]["BASE_URL"]
 MODEL = PARAMS[PROVIDER]["MODEL"]
 
+print(f"✅ Loaded API_KEY: {API_KEY[:10]}...")  # 只打印前 10 位，避免泄露
+
+
 if not API_KEY:
     raise EnvironmentError(f"❌ Missing API key for {PROVIDER}. Please set it as an environment variable.")
 
