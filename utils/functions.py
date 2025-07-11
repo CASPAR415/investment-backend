@@ -238,3 +238,4 @@ def update_stock_data(file_path: str):
     # Write back to the JSON file
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
+    # test update
