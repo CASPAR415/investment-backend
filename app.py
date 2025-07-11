@@ -11,11 +11,25 @@ import os, json
 app = Flask(__name__)
 CORS(app)
 
-
 # 路径配置
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 HOLDINGS_FILE = os.path.join(BASE_DIR, "data", "holding_state.json")
 DATA_FILE = os.path.join(BASE_DIR, "data", "company_data.json")
+
+# ✅ 测试环境变量是否正确加载
+@app.route('/test', methods=['GET'])
+def test_env():
+    key = os.getenv("OPENROUTER_API_KEY")
+    if key:
+        return jsonify({
+            "status": "✅ Success",
+            "key_prefix": key[:12] + "..."  # 避免泄露完整 key
+        })
+    else:
+        return jsonify({
+            "status": "❌ Failed",
+            "error": "OPENROUTER_API_KEY not found"
+        })
 
 # 初始化投资人格 & 资金
 @app.route('/init', methods=['POST'])
@@ -96,4 +110,3 @@ def prices():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-
