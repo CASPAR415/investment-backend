@@ -6,6 +6,7 @@ services:
     buildCommand: |
       pip cache purge
       pip install --upgrade pip
+      pip install --upgrade cython>=3.0.6  # 优先升级Cython
       pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     autoDeploy: true

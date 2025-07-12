@@ -6,3 +6,4 @@ numpy==1.26.4
 python-dotenv==1.0.0  # 或使用最新稳定版
 yfinance==0.2.64      # 保持不变
 gunicorn==21.2.0
+cython>=3.0.6 

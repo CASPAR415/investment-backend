@@ -16,6 +16,11 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 HOLDINGS_FILE = os.path.join(BASE_DIR, "data", "holding_state.json")
 DATA_FILE = os.path.join(BASE_DIR, "data", "company_data.json")
 
+data_dir = os.path.join(BASE_DIR, "data")
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir)
+    print(f"✅ 已创建 data 目录：{data_dir}")
+
 # ✅ 测试接口：验证环境变量是否加载
 @app.route('/test', methods=['GET'])
 def test_env():
