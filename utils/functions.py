@@ -3,6 +3,9 @@ import json
 from openai import OpenAI
 import yfinance as yf
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
+
 
 # ✅ 配置：从环境变量读取 API Key（更安全）
 PROVIDER = "OpenRouter"
