@@ -28,11 +28,11 @@ print(f"API_KEY = {API_KEY}")
 print(f"BASE_URL = {BASE_URL}")
 
 
-print(f"✅ Loaded API_KEY: {API_KEY[:10]}...")  # 只打印前 10 位，避免泄露
+#print(f"✅ Loaded API_KEY: {API_KEY[:10]}...")  # 只打印前 10 位，避免泄露
 
-
+# 只在需要用到 chat() 时再判断 API_KEY 是否存在
 if not API_KEY:
-    raise EnvironmentError(f"❌ Missing API key for {PROVIDER}. Please set it as an environment variable.")
+    print(f"⚠️ Warning: API_KEY for {PROVIDER} is not set. Some features like AI advice may not work.")
 
 # ✅ 投资组合状态初始化
 def init_state(file_path: str, amount: float):
