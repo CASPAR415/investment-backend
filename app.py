@@ -125,3 +125,4 @@ def trade():
 # ✅ 启动 Flask 应用
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+# updated trade endpoint confirmed
