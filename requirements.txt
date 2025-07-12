@@ -2,6 +2,7 @@ Flask==2.3.3          # 与原始环境一致
 flask-cors==6.0.1     # 保持不变
 openai==1.93.3        # 与原始环境一致
 pandas==2.1.4         # 与原始环境一致
+numpy==1.26.4
 python-dotenv==1.0.0  # 或使用最新稳定版
 yfinance==0.2.64      # 保持不变
 gunicorn==21.2.0
