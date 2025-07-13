@@ -4,10 +4,10 @@ from openai import OpenAI
 import yfinance as yf
 from datetime import datetime
 from dotenv import load_dotenv
+
 load_dotenv()
 
-
-# ✅ 配置：从环境变量读取 API Key（更安全）
+# 配置：从环境变量读取 API Key（更安全）
 PROVIDER = "OpenRouter"
 
 PARAMS = {
@@ -30,14 +30,11 @@ MODEL = PARAMS[PROVIDER]["MODEL"]
 print(f"API_KEY = {API_KEY}")
 print(f"BASE_URL = {BASE_URL}")
 
-
-#print(f"✅ Loaded API_KEY: {API_KEY[:10]}...")  # 只打印前 10 位，避免泄露
-
 # 只在需要用到 chat() 时再判断 API_KEY 是否存在
 if not API_KEY:
     print(f"⚠️ Warning: API_KEY for {PROVIDER} is not set. Some features like AI advice may not work.")
 
-# ✅ 投资组合状态初始化
+# 投资组合状态初始化
 def init_state(file_path: str, amount: float):
     data = {
         "cash": amount,
@@ -47,8 +44,13 @@ def init_state(file_path: str, amount: float):
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
-# ✅ 买入操作
+# 买入操作
 def buy_stock(file_path: str, symbol: str, quantity: int, price: float, datetime: str):
+    # 在读取文件之前检查文件是否存在
+    if not os.path.exists(file_path):
+        return f"Error: {file_path} not found. Please interact to generate the file first."
+
+    # 如果文件存在，继续读取文件
     with open(file_path, 'r') as f:
         data = json.load(f)
 
@@ -79,8 +81,13 @@ def buy_stock(file_path: str, symbol: str, quantity: int, price: float, datetime
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
-# ✅ 卖出操作
+# 卖出操作
 def sell_stock(file_path: str, symbol: str, quantity: int, price: float, datetime: str):
+    # 在读取文件之前检查文件是否存在
+    if not os.path.exists(file_path):
+        return f"Error: {file_path} not found. Please interact to generate the file first."
+
+    # 如果文件存在，继续读取文件
     with open(file_path, 'r') as f:
         data = json.load(f)
 
@@ -114,7 +121,7 @@ def sell_stock(file_path: str, symbol: str, quantity: int, price: float, datetim
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
-# ✅ 调用大模型获取建议
+# 调用大模型获取建议
 def chat(system_prompt: str, user_prompt: str):
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
     messages = [
@@ -128,7 +135,7 @@ def chat(system_prompt: str, user_prompt: str):
     )
     return response
 
-# ✅ 读取指定月份的新闻内容
+# 读取指定月份的新闻内容
 def get_news(file_path: str, datetime: str):
     with open(file_path, 'r') as file:
         data = json.load(file)
@@ -161,7 +168,7 @@ def get_news(file_path: str, datetime: str):
         output += "\n"
     return output.strip()
 
-# ✅ 获取当前持仓信息
+# 获取当前持仓信息
 def get_holdings(file_path: str):
     with open(file_path, 'r') as f:
         data = json.load(f)
@@ -177,7 +184,7 @@ def get_holdings(file_path: str):
 
     return output.strip()
 
-# ✅ 获取某支股票某月的价格信息
+# 获取某支股票某月的价格信息
 def get_price(symbol: str, year_month: str) -> dict:
     try:
         year, month = map(int, year_month.split('-'))
@@ -204,7 +211,7 @@ def get_price(symbol: str, year_month: str) -> dict:
         print(f"Error fetching data for {symbol}: {e}")
         return {}
 
-# ✅ 批量更新 JSON 中的股票价格
+# 批量更新 JSON 中的股票价格
 def update_stock_data(file_path: str):
     with open(file_path, 'r') as f:
         data = json.load(f)

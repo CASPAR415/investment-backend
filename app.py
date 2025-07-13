@@ -65,7 +65,11 @@ def advice():
         system_prompt = Prompts.get_personality(personality)
         advice_prompt = Prompts.get_advice_prompt(news, holdings)
 
+        print(f"System prompt: {system_prompt}")
+        print(f"Advice prompt: {advice_prompt}")
+        
         response = chat(system_prompt, advice_prompt)
+        print(f"外部API响应：{response}")
         result = json.loads(response.choices[0].message.content)
         return jsonify(result)
 
