@@ -9,7 +9,7 @@ from utils.functions import (
 )
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "https://investment-simulator-hazel.vercel.app"}})
 
 # 路径配置
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
