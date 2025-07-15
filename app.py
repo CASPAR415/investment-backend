@@ -5,7 +5,7 @@ import os, json
 from utils.prompt import Prompts
 from utils.functions import (
     init_state, buy_stock, sell_stock,
-    chat, get_news, get_holdings, get_price
+    chat, get_news, get_holdings, get_price, update_date
 )
 
 app = Flask(__name__)
@@ -130,6 +130,14 @@ def trade():
         return jsonify({"message": f"{action.title()} {quantity} shares of {symbol} at ${price}"})
     except ValueError as e:
         return jsonify({"error": str(e)})
+
+# ✅ 更新日期
+@app.route('/update-date', methods=['POST'])
+def update_current_date():
+    data = request.json
+    current_date = data.get("date")
+    new_date = update_date(current_date)
+    return jsonify({"new_date": new_date})
 
 # ✅ 启动 Flask 应用
 if __name__ == "__main__":

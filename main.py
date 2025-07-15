@@ -8,7 +8,8 @@ from utils.functions import (
     chat,
     get_news,
     get_holdings,
-    get_price
+    get_price,
+    update_date
 )
 
 def main():
@@ -20,6 +21,7 @@ def main():
     # Get user's investment personality
     personality = input("Enter your investment personality/style (e.g. 'conservative long-term investor'): ")
     system_prompt = Prompts.get_personality(personality)
+    date = input("Enter initial month-year (YYYY-MM): ")
     
     # Initialize portfolio with $10,000
     if not os.path.exists(HOLDINGS_FILE):
@@ -28,16 +30,17 @@ def main():
     
     while True:
         print("\n--- Investment Advisor Menu ---")
+        print(f"Current Date: {date}")
         print("\n1. Get investment advice for a month")
         print("2. Execute trade")
         print("3. View current holdings")
         print("4. View monthly price data for all companies")
-        print("5. Exit")
+        print("5. Update to next month")
+        print("6. Exit")
         choice = input("Select an option: ")
         
         if choice == "1":
             # Get advice for specific month
-            date = input("Enter month-year (YYYY-MM): ")
             news = get_news(DATA_FILE, date)
             holdings = get_holdings(HOLDINGS_FILE)
             
@@ -59,7 +62,6 @@ def main():
             symbol = input("Enter stock symbol: ").upper()
             action = input("Buy or Sell? ").lower()
             quantity = int(input("Number of shares: "))
-            date = input("Enter month-year (YYYY-MM): ")
             
             # Get latest price
             price_data = get_price(symbol, date)
@@ -88,7 +90,6 @@ def main():
             
         elif choice == "4":
             # View monthly price data for all companies
-            date = input("Enter month-year (YYYY-MM): ")
             try:
                 with open(DATA_FILE, 'r') as f:
                     data = json.load(f)
@@ -106,8 +107,15 @@ def main():
 
             except Exception as e:
                 print(f"Error loading price data: {e}")
-                
+        
         elif choice == "5":
+            date = update_date(date)
+            print(f"Updated date to {date}")
+            if date >= "2024-12":
+                print("You have reached the end of the simulation period.")
+                break
+
+        elif choice == "6":
             break
             
         else:
@@ -115,3 +123,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
