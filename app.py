@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import os, json
+import traceback
 
 from utils.prompt import Prompts
 from utils.functions import (
@@ -70,12 +71,22 @@ def advice():
         
         response = chat(system_prompt, advice_prompt)
         print(f"外部API响应：{response}")
-        result = json.loads(response.choices[0].message.content)
-        return jsonify(result)
+        try:
+            response_data = response.choices[0].message.content
+            result = json.loads(response_data)
+            return jsonify(result)
+        except (json.JSONDecodeError, AttributeError) as e:
+            print(f"❌ JSON解析错误：{response_data}")
+            return jsonify({
+                "error": "Failed to parse AI response",
+                "details": str(e),
+                "raw_response": response_data[:500]  # 返回部分原始响应
+            }), 500
 
     except Exception as e:
         print("❌ 错误发生在 /advice：", str(e))
         return jsonify({"error": f"Response parse error: {str(e)}"}), 500
+        traceback.print_exc()  # 打印完整堆栈跟踪
 
 # ✅ 查看持仓接口（关键）
 @app.route('/holdings', methods=['GET'])
